@@ -9,9 +9,7 @@ const port = 3000;
 app.use(morgan("dev"));
 app.use(express.json());
 
-app.listen(port, () => {
-  console.log(`Example app listening on port http://localhost:${port}`);
-});
+
 
 type Planet = {
   id: number;
@@ -87,4 +85,8 @@ app.delete("/api/planets/:id", (req, res) => {
   planets = planets.filter((planet) => planet.id !== Number(id));
   console.log(planets);
   res.status(200).json({ msg: "Il pianeta è stato cancellato" });
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port http://localhost:${port}`);
 });
