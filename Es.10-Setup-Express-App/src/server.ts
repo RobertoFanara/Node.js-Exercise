@@ -1,92 +1,38 @@
 import express from "express";
 import "express-async-errors";
 import morgan from "morgan";
-import Joi from "joi";
+import { createPlanet, deleteById, getAll, getOneById, updateById, uploadImage } from "./controllers/planets.js";
+import multer from "multer";
 
-const app = express();
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./upload");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+})
+
+const upload = multer({storage})
+
+const app = express()
 const port = 3000;
 
-app.use(morgan("dev"));
+app.use(morgan("dev"))
 app.use(express.json());
 
+app.get('/api/planets', getAll)
 
+app.get('/api/planets/:id', getOneById)
 
-type Planet = {
-  id: number;
-  name: string;
-};
+app.post('/api/planets', createPlanet)
 
-type Planets = Planet[];
+app.put('/api/planets/:id', updateById)
 
-let planets: Planets = [
-  {
-    id: 1,
-    name: "Earth",
-  },
-  {
-    id: 2,
-    name: "Mars",
-  },
-];
+app.delete('/api/planets/:id', deleteById)
 
-const planetSchema = Joi.object({
-  id: Joi.number().integer().required(),
-  name: Joi.string().required(),
-});
-
-app.get("/api/planets", (req, res) => {
-  res.status(200).json(planets);
-});
-
-//gettin planets
-app.get("/api/planets/:id", (req, res) => {
-  const { id } = req.params;
-  const planet = planets.find((item) => item.id === Number(id));
-  res.status(200).json(planet);
-});
-
-//posting new planets
-app.post("/api/planets", (req, res) => {
-  const { id, name } = req.body;
-  const newPlanet = { id, name };
-  const validateNewPlanet = planetSchema.validate(newPlanet);
-  if (validateNewPlanet.error) {
-    return res
-      .status(400)
-      .json({ msg: validateNewPlanet.error.details[0].message });
-  } else {
-    planets = [...planets, newPlanet];
-    res.status(201).json({ msg: "Il pianeta è stato creato" });
-  }
-  console.log(planets);
-});
-
-//reformatting a planets
-app.put("/api/planets/:id", (req, res) => {
-  const id = req.params.id;
-  const { name } = req.body;
-  const validateUpdatedPlanet = planetSchema.validate(id);
-  if (validateUpdatedPlanet.error) {
-    return res
-      .status(400)
-      .json({ msg: validateUpdatedPlanet.error.details[0].message });
-  } else {
-    planets = planets.map((planet) =>
-      planet.id === Number(id) ? { ...planet, name } : planet
-    );
-    res.status(200).json({ msg: "Il pianeta è stato aggiornato" });
-  }
-  console.log(planets);
-});
-
-//deleting a planet
-app.delete("/api/planets/:id", (req, res) => {
-  const { id } = req.params;
-  planets = planets.filter((planet) => planet.id !== Number(id));
-  console.log(planets);
-  res.status(200).json({ msg: "Il pianeta è stato cancellato" });
-});
+app.post('/api/planets/:id/image', upload.single("image"), uploadImage)
 
 app.listen(port, () => {
-  console.log(`Example app listening on port http://localhost:${port}`);
-});
+  console.log(`Example app listening on port http://localhost:${port}`)
+})
