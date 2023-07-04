@@ -1,8 +1,8 @@
 import pgPromise from "pg-promise";
 
-const db = pgPromise()("postgres://postgres:postgres@localhost:5432/video");
+const db = pgPromise()("postgres://postgres:postgres@localhost:5432/video")
 
-const setupDB = async () => {
+const setupDb = async () => {
   await db.none(`
   DROP TABLE IF EXISTS planets;
 
@@ -22,11 +22,11 @@ const setupDB = async () => {
   );
   `);
 
-  await db.none(`INSERT INTO planets (name) VALUES ('Earth')`);
-  await db.none(`INSERT INTO planets (name) VALUES ('Mars')`);
-  await db.none(`INSERT INTO users (username, password) VALUES ('dummy', 'dummy')`);
-};
+  await db.none(`INSERT INTO planets (name) VALUES ('Earth')`)
+  await db.none(`INSERT INTO planets (name) VALUES ('Mars')`)
+  await db.none(`INSERT INTO users (username, password) VALUES ('dummy','dummy')`)
+}
 
-setupDB();
+setupDb();
 
 export { db };
