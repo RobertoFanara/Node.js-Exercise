@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Joi from "joi";
-import { db } from "../db";
+import { db } from "./../db.js";
 
 
 type Planet = {
